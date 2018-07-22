@@ -105,4 +105,4 @@ uint16_t g_sh1_m2rpm=0,go_sh1_m2rpm=0;
 int g_tscr_power=0;
 int g_tscr_rudder=0;
 char g_tscr_takeover=0;
-
+word g_tscr_power_color=VGA_FUCHSIA;

@@ -106,7 +106,7 @@ Serial.println(g_touchy);
       a=180.0*SpeedTrig.atan2(WHEEL_Y0-g_touchy,g_touchx-WHEEL_X0)/PI;
       animateWheel(WHEEL_X0,WHEEL_Y0,a,WHEEL_R1,WHEEL_R2,WHEEL_A1,WHEEL_B,g_dsp_background,VGA_GREEN);
     } else if((g_touchy <= POWER_Y0) && (g_touchx >= POWER_X0) && (g_touchx <= POWER_X0+POWER_A)) {
-      animatePower(POWER_X0,POWER_Y0,POWER_A,POWER_B,g_touchy,g_dsp_background,VGA_FUCHSIA);
+      animatePower(POWER_X0,POWER_Y0,POWER_A,POWER_B,g_touchy,g_dsp_background,g_tscr_power_color);
     } else if((g_touchx >= POSLIGHT_X0) && (g_touchy >= POSLIGHT_Y0) && (g_touchx <= (POSLIGHT_X0+POSLIGHT_A)) && (g_touchy <= (POSLIGHT_Y0+POSLIGHT_B))) {
       draw_poslight(UCCB_PL_OFF);
     } else if((g_touchx >= (POSLIGHT_X0+1*(POSLIGHT_A+POSLIGHT_X_SHIFT))) && (g_touchy >= POSLIGHT_Y0) && (g_touchx <= (POSLIGHT_X0+1*(POSLIGHT_A+POSLIGHT_X_SHIFT)+POSLIGHT_A)) && (g_touchy <= (POSLIGHT_Y0+POSLIGHT_B))) {

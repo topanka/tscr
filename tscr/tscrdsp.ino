@@ -33,7 +33,7 @@ int dsp_setup(void)
 
   drawWheel(WHEEL_X0,WHEEL_Y0,90,WHEEL_R1,WHEEL_R2,WHEEL_A1,WHEEL_B,g_dsp_background,VGA_GREEN);
   pwr0=POWER_Y0-POWER_B/3;
-  drawPower(POWER_X0,POWER_Y0,POWER_A,POWER_B,pwr0,g_dsp_background,VGA_PURPLE);
+  drawPower(POWER_X0,POWER_Y0,POWER_A,POWER_B,pwr0,g_dsp_background,g_tscr_power_color);
   myGLCD.setColor(VGA_GREEN);
   myGLCD.printNumI((long)0,POWER_X0+POWER_A+3,pwr0-myGLCD.getFontYsize()/2);
   myGLCD.print((char*)"%",POWER_X0+POWER_A+3+myGLCD.getFontXsize(),pwr0-myGLCD.getFontYsize()/2);
@@ -43,12 +43,16 @@ int dsp_setup(void)
   myGLCD.print((char*)"%",POWER_X0+POWER_A+3+3*myGLCD.getFontXsize(),POWER_Y0-POWER_B-myGLCD.getFontYsize()/2);
  
   myGLCD.setColor(VGA_YELLOW);
-  myGLCD.printNumI((long)go_cb_fsX,50,380);
-  myGLCD.printNumI((long)go_cb_fsY,170,380);
-  myGLCD.printNumI((long)go_cb_fsZ,290,380);
-  myGLCD.printNumI((long)go_cb_m1s,50,405);
-  myGLCD.printNumI((long)go_cb_m2s,170,405);
-  myGLCD.printNumI((long)go_cb_rdd,290,405);
+  myGLCD.printNumI((long)go_cb_fsX,50,370);
+  myGLCD.printNumI((long)go_cb_fsY,170,370);
+  myGLCD.printNumI((long)go_cb_fsZ,290,370);
+  myGLCD.printNumI((long)go_cb_m1s,50,395);
+  myGLCD.printNumI((long)go_cb_m2s,170,395);
+  myGLCD.printNumI((long)go_cb_rdd,290,395);
+  
+  myGLCD.print((char*)"RPM:",10,420);
+  myGLCD.printNumI((long)go_cb_m2s,100,420);
+  myGLCD.printNumI((long)go_cb_m1s,200,420);
 
   draw_poslight(UCCB_PL_OFF);
   
@@ -195,7 +199,7 @@ int compWheel(int x0, int y0, int ax, int R1, int R2, int a1, int b,
 
 int angle_write(int a)
 {
-  int n,x,y;
+  int n,x,y,xd,yd;
 
   a=-(a-90);
   g_tscr_rudder=a;
@@ -203,6 +207,8 @@ int angle_write(int a)
   n=numPlaces(abs(a));
   x=WHEEL_X0-n*myGLCD.getFontXsize()/2;
   y=WHEEL_Y0-100;
+  xd=WHEEL_X0+n*myGLCD.getFontXsize()/2;
+  yd=y;
   myGLCD.printNumI(abs(a),x,y);
   if(a < 0) {
     y+=myGLCD.getFontYsize()/2;
@@ -210,6 +216,9 @@ int angle_write(int a)
     myGLCD.drawLine(x-25,y,x-5,y);
     myGLCD.drawLine(x-25,y+1,x-5,y+1);
   }
+  myGLCD.setFont(BigFont);
+  yd=yd-myGLCD.getFontYsize()/4;
+  myGLCD.print((char*)"o",xd,yd);
 }
 
 int drawWheel(int x0, int y0, int a, int R1, int R2, int a1, int b, 
@@ -374,23 +383,37 @@ int pwr_percent(int pwr, int *spwr)
 
 int pwr_write(int pwr)
 {
-  int spwr,n,x,y,xp;
+  int spwr,n,x,y,xp,yp,s;
   
   myGLCD.setFont(SevenSegNumFont);
   pwr_percent(pwr,&spwr);
   g_tscr_power=spwr;
   n=numPlaces(abs(spwr));
+  s=myGLCD.getFontYsize();
   x=WHEEL_X0-n*myGLCD.getFontXsize()/2;
-  xp=WHEEL_X0+n*myGLCD.getFontXsize()/2;
   y=WHEEL_Y0+50;
+  xp=WHEEL_X0+n*myGLCD.getFontXsize()/2;
+  yp=y;
   myGLCD.printNumI(abs(spwr),x,y);
-//  myGLCD.print("%",xp,y);
   if(spwr < 0) {
     y+=myGLCD.getFontYsize()/2;
     myGLCD.drawLine(x-25,y-1,x-5,y-1);
     myGLCD.drawLine(x-25,y,x-5,y);
     myGLCD.drawLine(x-25,y+1,x-5,y+1);
   }
+  myGLCD.setFont(BigFont);
+  yp=yp-myGLCD.getFontYsize()/4;
+  myGLCD.print((char*)"o",xp,yp);
+  x=xp;
+  y=yp;
+  xp=xp+myGLCD.getFontXsize();
+  yp=yp+s-myGLCD.getFontYsize();
+  myGLCD.print((char*)"o",xp,yp);
+  x=x+myGLCD.getFontYsize()/2;
+  y=y+myGLCD.getFontYsize()/2;
+  xp=xp+myGLCD.getFontYsize()/2;
+  yp=yp+myGLCD.getFontYsize()/2;
+  myGLCD.drawLine(x,yp,xp,y);
 }
 
 int drawPower(int x0, int y0, int a, int b, int pwr, word bclr, word fclr)
@@ -441,45 +464,59 @@ int tscr_display(void)
 {
   if(go_cb_fsX != g_cb_fsX) {
     myGLCD.setColor(g_dsp_background);
-    myGLCD.printNumI((long)go_cb_fsX,50,380);
+    myGLCD.printNumI((long)go_cb_fsX,50,370);
     go_cb_fsX=g_cb_fsX;
     myGLCD.setColor(VGA_YELLOW);
-    myGLCD.printNumI((long)go_cb_fsX,50,380);
+    myGLCD.printNumI((long)go_cb_fsX,50,370);
   }
   if(go_cb_fsY != g_cb_fsY) {
     myGLCD.setColor(g_dsp_background);
-    myGLCD.printNumI((long)go_cb_fsY,170,380);
+    myGLCD.printNumI((long)go_cb_fsY,170,370);
     go_cb_fsY=g_cb_fsY;
     myGLCD.setColor(VGA_YELLOW);
-    myGLCD.printNumI((long)go_cb_fsY,170,380);
+    myGLCD.printNumI((long)go_cb_fsY,170,370);
   }
   if(go_cb_fsZ != g_cb_fsZ) {
     myGLCD.setColor(g_dsp_background);
-    myGLCD.printNumI((long)go_cb_fsZ,290,380);
+    myGLCD.printNumI((long)go_cb_fsZ,290,370);
     go_cb_fsZ=g_cb_fsZ;
     myGLCD.setColor(VGA_YELLOW);
-    myGLCD.printNumI((long)go_cb_fsZ,290,380);
+    myGLCD.printNumI((long)go_cb_fsZ,290,370);
   }
   if(go_cb_m1s != g_cb_m1s) {
     myGLCD.setColor(g_dsp_background);
-    myGLCD.printNumI((long)go_cb_m1s,50,405);
+    myGLCD.printNumI((long)go_cb_m1s,50,395);
     go_cb_m1s=g_cb_m1s;
     myGLCD.setColor(VGA_YELLOW);
-    myGLCD.printNumI((long)go_cb_m1s,50,405);
+    myGLCD.printNumI((long)go_cb_m1s,50,395);
   }
   if(go_cb_m2s != g_cb_m2s) {
     myGLCD.setColor(g_dsp_background);
-    myGLCD.printNumI((long)go_cb_m2s,170,405);
+    myGLCD.printNumI((long)go_cb_m2s,170,395);
     go_cb_m2s=g_cb_m2s;
     myGLCD.setColor(VGA_YELLOW);
-    myGLCD.printNumI((long)go_cb_m2s,170,405);
+    myGLCD.printNumI((long)go_cb_m2s,170,395);
   }
   if(go_cb_rdd != g_cb_rdd) {
     myGLCD.setColor(g_dsp_background);
-    myGLCD.printNumI((long)go_cb_rdd,290,405);
+    myGLCD.printNumI((long)go_cb_rdd,290,395);
     go_cb_rdd=g_cb_rdd;
     myGLCD.setColor(VGA_YELLOW);
-    myGLCD.printNumI((long)go_cb_rdd,290,405);
+    myGLCD.printNumI((long)go_cb_rdd,290,395);
+  }
+  if(go_sh1_m2rpm != g_sh1_m2rpm) {
+    myGLCD.setColor(g_dsp_background);
+    myGLCD.printNumI((long)go_sh1_m2rpm,100,420);
+    go_sh1_m2rpm=g_sh1_m2rpm;
+    myGLCD.setColor(VGA_YELLOW);
+    myGLCD.printNumI((long)go_sh1_m2rpm,100,420);
+  }
+  if(go_sh1_m1rpm != g_sh1_m1rpm) {
+    myGLCD.setColor(g_dsp_background);
+    myGLCD.printNumI((long)go_sh1_m1rpm,200,420);
+    go_sh1_m1rpm=g_sh1_m1rpm;
+    myGLCD.setColor(VGA_YELLOW);
+    myGLCD.printNumI((long)go_sh1_m1rpm,200,420);
   }
 }
 
@@ -527,25 +564,25 @@ int draw_poslight(int poslight)
   y0=POSLIGHT_Y0+POSLIGHT_B/2-myGLCD.getFontYsize()/2;
   x0=POSLIGHT_X0+0*(POSLIGHT_A+POSLIGHT_X_SHIFT)+POSLIGHT_A/2-(3*myGLCD.getFontXsize())/2;
   if(g_cb_poslight == UCCB_PL_OFF) {
-    myGLCD.setColor(VGA_YELLOW);
-} else {
     myGLCD.setColor(VGA_WHITE);
+} else {
+    myGLCD.setColor(VGA_LIME);
   }
 //  myGLCD.print("On",POSLIGHT_X0+0*(POSLIGHT_A+POSLIGHT_X_SHIFT),y0);
   myGLCD.print((char*)"Off",x0,y0);
   x0=POSLIGHT_X0+1*(POSLIGHT_A+POSLIGHT_X_SHIFT)+POSLIGHT_A/2-(2*myGLCD.getFontXsize())/2;
   if(g_cb_poslight == UCCB_PL_ON) {
-    myGLCD.setColor(VGA_YELLOW);
-  } else {
     myGLCD.setColor(VGA_WHITE);
+  } else {
+    myGLCD.setColor(VGA_LIME);
   }
 //  myGLCD.print("Off",POSLIGHT_X0+1*(POSLIGHT_A+POSLIGHT_X_SHIFT),y0);
   myGLCD.print((char*)"On",x0,y0);
   x0=POSLIGHT_X0+2*(POSLIGHT_A+POSLIGHT_X_SHIFT)+POSLIGHT_A/2-(5*myGLCD.getFontXsize())/2;
   if(g_cb_poslight == UCCB_PL_BLINK) {
-    myGLCD.setColor(VGA_YELLOW);
-  } else {
     myGLCD.setColor(VGA_WHITE);
+  } else {
+    myGLCD.setColor(VGA_LIME);
   }
 //  myGLCD.print("Blink",POSLIGHT_X0+2*(POSLIGHT_A+POSLIGHT_X_SHIFT),y0);
   myGLCD.print((char*)"Blink",x0,y0);

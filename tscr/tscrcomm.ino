@@ -10,9 +10,10 @@ unsigned int g_rts_len=0;
  
 int comm_setup(void)
 {
-  Serial2.begin(115200);
+  Serial2.begin(250000);
   buildCRCTable();
-  tmr_init(&g_tmr_comm,250);
+//  tmr_init(&g_tmr_comm,250);
+  tmr_init(&g_tmr_comm,200);
 }
 
 int tscr_comm_pack1(byte *d, uint16_t l, byte *buf, uint16_t *len)
@@ -256,7 +257,7 @@ int comm_recv(void)
       g_tscr_rudder=0;
       drawWheel(WHEEL_X0,WHEEL_Y0,90,WHEEL_R1,WHEEL_R2,WHEEL_A1,WHEEL_B,g_dsp_background,VGA_GREEN);
       pwr0=POWER_Y0-POWER_B/3;
-      drawPower(POWER_X0,POWER_Y0,POWER_A,POWER_B,pwr0,g_dsp_background,VGA_PURPLE);
+      drawPower(POWER_X0,POWER_Y0,POWER_A,POWER_B,pwr0,g_dsp_background,g_tscr_power_color);
     }
 
     if(g_cb_poslight == go_cb_poslight) {
